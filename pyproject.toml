@@ -1,0 +1,35 @@
+[project]
+name = "todo-backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    # ── Application ────────────────────────────────────────────────────────────
+    "alembic>=1.13.0",
+    "bcrypt==4.0.1",
+    "fastapi[standard]>=0.135.1",
+    "passlib==1.7.4",
+    "psycopg2>=2.9.11",
+    "python-jose[cryptography]>=3.5.0",
+    "sqlalchemy>=2.0.48",
+
+    # ── OpenTelemetry core ─────────────────────────────────────────────────────
+    "opentelemetry-api>=1.24.0",
+    "opentelemetry-sdk>=1.24.0",
+
+    # ── OTLP exporter (used when switching to Collector in production) ──────────
+    # Bug 9 fixed: was listed twice — removed the duplicate entry.
+    "opentelemetry-exporter-otlp>=1.24.0",
+
+    # ── Auto-instrumentation for FastAPI backend only ──────────────────────────
+    # Bug 9 fixed: opentelemetry-instrumentation-flask and
+    #              opentelemetry-instrumentation-requests removed — these belong
+    #              in the Flask frontend (Todo_frontend), not the FastAPI backend.
+    # Bug 9 fixed: opentelemetry-exporter-gcp-trace and
+    #              opentelemetry-exporter-gcp-monitoring removed — not used in the
+    #              current file-based dev setup. Re-add when wiring up GCP.
+    "opentelemetry-instrumentation-fastapi>=0.45b0",
+    "opentelemetry-instrumentation-sqlalchemy>=0.45b0",
+    "opentelemetry-instrumentation-logging>=0.45b0",
+]
