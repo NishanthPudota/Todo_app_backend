@@ -7,6 +7,7 @@ from opentelemetry._logs import set_logger_provider
 # Trace SDK
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, SpanExporter, SpanExportResult
+from opentelemetry.exporter.otlp.proto.http.metric_exporter import OTLPMetricExporter
 
 # Metrics SDK
 from opentelemetry.sdk.metrics import MeterProvider
@@ -33,6 +34,8 @@ from opentelemetry.instrumentation.logging import LoggingInstrumentor
 # Bug 1 fixed: removed duplicate OTLPSpanExporter imports (grpc + http both imported
 # under the same name — second silently overwrote first). Neither is needed here
 # since we are using the custom JSONL file exporters.
+
+OTEL_COLLECTOR_ENDPOINT = "http://35.224.12.235:4318/v1/metrics"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -161,23 +164,22 @@ def setup_telemetry(app, engine):
     # ── Traces ────────────────────────────────────────────────────────────────
     # Bug 3 fixed: raw string (r"...") prevents \t in \tracesandmetrics being
     # interpreted as a tab character by Python's string parser.
+    '''
     tracer_provider = TracerProvider(resource=resource)
     tracer_provider.add_span_processor(
         BatchSpanProcessor(
             JSONLSpanExporter(
-                r"C:\GCP-DataEngineering\Project_ToDo\tracesandmetrics\dev_traces.jsonl"
+                r"/home/nishanth/project_todo/tracesandmetrics/dev_traces.jsonl"
             )
         )
     )
     trace.set_tracer_provider(tracer_provider)
-
+    '''
     # ── Metrics ───────────────────────────────────────────────────────────────
     # Bug 4 fixed: same raw string fix applied here.
     metric_reader = PeriodicExportingMetricReader(
-        JSONLMetricExporter(
-            r"C:\GCP-DataEngineering\Project_ToDo\tracesandmetrics\dev_metrics.jsonl"
-        ),
-        export_interval_millis=60_000,
+        OTLPMetricExporter(endpoint=OTEL_COLLECTOR_ENDPOINT),
+        export_interval_millis=120000,
     )
     meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
     metrics.set_meter_provider(meter_provider)
